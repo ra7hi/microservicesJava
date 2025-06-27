@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "microservices.order_processing.inventory_service.grpc";
+
+package order;
+
+service OrderService {
+  rpc CheckProductAvailability (ProductIdRequest) returns (ProductsAvailabilityResponse);
+}
+
+message ProductIdRequest{
+  repeated int64 product_ids = 1;
+}
+
+message ProductAvailability {
+  int64 product_id = 1;
+  bool isProductAvailability = 2;
+  string name = 3;
+  int64 quantity = 4;
+  double price = 5;
+  double sale = 6;
+}
+
+
+message ProductsAvailabilityResponse {
+  repeated ProductAvailability products = 1;
+}
+
