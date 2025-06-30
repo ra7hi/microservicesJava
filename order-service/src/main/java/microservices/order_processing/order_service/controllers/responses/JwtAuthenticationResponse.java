@@ -8,8 +8,8 @@ import microservices.order_processing.order_service.entities.Users;
 @Setter
 public class JwtAuthenticationResponse {
     private String accessToken;
-    private String tokenType = "Bearer";
     private Users user;
+    private String tokenType = "Bearer";
 
     public JwtAuthenticationResponse(String accessToken, Users user) {
         this.accessToken = accessToken;

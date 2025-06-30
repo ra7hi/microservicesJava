@@ -2,6 +2,7 @@ package microservices.order_processing.order_service.kafka;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,10 @@ import java.util.concurrent.CompletableFuture;
 @RequiredArgsConstructor
 @Slf4j
 public class KafkaProducerService {
+
+    @Value("${kafka.topics.order-events}")
+    private String orderEventsTopic;
+
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
     public void sendMessage(String topic, String key, Object message) {
@@ -30,7 +35,6 @@ public class KafkaProducerService {
     }
 
     public void sendOrderEvent(String eventType, Object orderData) {
-        String topic = "order-events";
-        sendMessage(topic, eventType, orderData);
+        sendMessage(orderEventsTopic, eventType, orderData);
     }
 }

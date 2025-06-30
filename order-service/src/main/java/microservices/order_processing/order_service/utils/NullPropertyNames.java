@@ -1,16 +1,14 @@
-package microservices.order_processing.order_service.config;
+package microservices.order_processing.order_service.utils;
 
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
-import org.springframework.context.annotation.Configuration;
 
 import java.beans.PropertyDescriptor;
 import java.util.HashSet;
 import java.util.Set;
 
-@Configuration
 public class NullPropertyNames {
-    public String[] getNullPropertyNames(Object source) {
+    public static String[] getNullPropertyNames(Object source) {
         final BeanWrapper src = new BeanWrapperImpl(source);
         PropertyDescriptor[] pds = src.getPropertyDescriptors();
 

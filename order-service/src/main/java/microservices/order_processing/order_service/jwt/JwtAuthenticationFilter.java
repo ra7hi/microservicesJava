@@ -17,6 +17,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Component
 @Slf4j
@@ -32,32 +33,36 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain)
                                         throws ServletException, IOException {
-        try {
-            String jwt = getJwtFromRequest(request);
 
-            if (StringUtils.hasText(jwt) && jwtUtils.validateToken(jwt)) {
-                String username = jwtUtils.getUsernameFromToken(jwt);
+        Optional<String> jwt = getJwtFromRequest(request);
+        if (jwt.isPresent()) {
+            String token = jwt.get();
 
+            if (jwtUtils.validateToken(token)) {
+                String username = jwtUtils.getUsernameFromToken(token);
                 UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
+
                 UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(userDetails, null,
-                                userDetails.getAuthorities());
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+            } else {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+                response.getWriter().write("{\"success\":false,\"message\":\"Invalid or expired token\"}");
+                return;
             }
-        } catch (Exception ex) {
-            logger.error("Could not set user authentication in security context", ex);
         }
 
         filterChain.doFilter(request, response);
     }
 
-    private String getJwtFromRequest(HttpServletRequest request) {
+    private Optional<String> getJwtFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
+            return Optional.of(bearerToken.substring(7));
         }
-        return null;
+        return Optional.empty();
     }
 }
