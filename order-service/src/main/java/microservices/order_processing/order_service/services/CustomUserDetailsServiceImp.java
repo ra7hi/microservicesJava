@@ -1,9 +1,9 @@
 package microservices.order_processing.order_service.services;
 
+import lombok.RequiredArgsConstructor;
 import microservices.order_processing.order_service.entities.Users;
 import microservices.order_processing.order_service.impl.UserDetailsImpl;
 import microservices.order_processing.order_service.repository.UsersRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -11,13 +11,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class CustomUserDetailsService implements UserDetailsService {
+@RequiredArgsConstructor
+public class CustomUserDetailsServiceImp implements UserDetailsService {
 
     private final UsersRepository usersRepository;
-    @Autowired
-    public CustomUserDetailsService(UsersRepository usersRepository) {
-        this.usersRepository = usersRepository;
-    }
 
     @Override
     @Transactional

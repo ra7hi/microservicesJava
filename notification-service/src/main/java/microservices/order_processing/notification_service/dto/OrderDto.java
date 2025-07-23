@@ -5,11 +5,8 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Getter
-@Setter
+@Data
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
 public class OrderDto {
     private String orderId;
     private List<ProductDto> products;

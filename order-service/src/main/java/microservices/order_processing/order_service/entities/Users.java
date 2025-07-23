@@ -13,13 +13,12 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.EnumType;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.Data;
 import lombok.AllArgsConstructor;
-import lombok.ToString;
+import lombok.NoArgsConstructor;
+import lombok.Builder;
 
+import microservices.order_processing.order_service.enums.Role;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -27,11 +26,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Getter
-@Setter
-@AllArgsConstructor
+@Data
 @NoArgsConstructor
-@ToString
+@AllArgsConstructor
 @Builder
 public class Users {
     @Id

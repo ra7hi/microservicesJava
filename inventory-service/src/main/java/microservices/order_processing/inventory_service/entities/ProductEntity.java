@@ -1,15 +1,19 @@
 package microservices.order_processing.inventory_service.entities;
 
 import jakarta.persistence.*;
-import lombok.*;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 
 @Entity
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Product {
+@Table(name = "product")
+public class ProductEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,7 +25,10 @@ public class Product {
     private Double price;
 
     @Column(nullable = false)
-    private Long quantity;
+    private Long totalQuantity;
+
+    @Column(nullable = false)
+    private Long availableQuantity;
 
     @Column(nullable = false)
     private Double sale;

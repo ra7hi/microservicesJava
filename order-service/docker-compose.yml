@@ -14,4 +14,41 @@ services:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1\
+
+#  postgres-order:
+#    image: postgres:17
+#    container_name: postgres-order
+#    environment:
+#      POSTGRES_DB: order_db
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: PI13b7M29g250L
+#    ports:
+#      - "5433:5432"
+#    volumes:
+#      - ./db/init/order:/docker-entrypoint-initdb.d/
+#
+#  postgres-inventory:
+#    image: postgres:17
+#    container_name: postgres-inventory
+#    environment:
+#      POSTGRES_DB: inventory_db
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: PI13b7M29g250L
+#    ports:
+#      - "5434:5432"
+#    volumes:
+#      - ./db/init/inventory:/docker-entrypoint-initdb.d/
+#
+#  postgres-notification:
+#    image: postgres:17
+#    container_name: postgres-notification
+#    environment:
+#      POSTGRES_DB: notification_db
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: PI13b7M29g250L
+#    ports:
+#      - "5435:5432"
+#    volumes:
+#      - ./db/init/notification:/docker-entrypoint-initdb.d/
+

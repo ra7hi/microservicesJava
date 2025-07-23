@@ -8,5 +8,6 @@ import java.util.List;
 @Getter
 @Setter
 public class OrderRequest {
-    private List<Long> productIds;
+    private List<ProductOdrer> productsRequest;
+    private String orderId;
 }

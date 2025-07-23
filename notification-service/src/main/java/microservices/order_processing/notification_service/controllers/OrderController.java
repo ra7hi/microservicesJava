@@ -1,6 +1,6 @@
 package microservices.order_processing.notification_service.controllers;
 
-import microservices.order_processing.notification_service.OrderService.OrderService;
+import microservices.order_processing.notification_service.services.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,7 +25,7 @@ public class OrderController {
     }
 
     @GetMapping("/{order_id}")
-    public ResponseEntity<?> getOrdersById(@PathVariable Long order_id) {
+    public ResponseEntity<?> getOrdersById(@PathVariable String order_id) {
         return ResponseEntity.ok(orderService.getAllOrdersByOrderId(order_id));
     }
 

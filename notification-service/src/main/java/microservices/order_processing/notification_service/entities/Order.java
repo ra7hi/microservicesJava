@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @Table(name = "orders")
@@ -16,18 +17,10 @@ import java.time.LocalDateTime;
 @Builder
 public class Order {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
-    private String orderId;
-
-    private Long productId;
-
-    private Long quantity;
-
-    private Double price;
-
-    private Double sale;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    private Set<OrderItems> orderItems;
 
     private Double totalPrice;
 

@@ -6,24 +6,35 @@ option java_package = "microservices.order_processing.inventory_service.grpc";
 package order;
 
 service OrderService {
-  rpc CheckProductAvailability (ProductIdRequest) returns (ProductsAvailabilityResponse);
+  rpc CheckProductAvailability (ProductsRequest) returns (ProductsAvailabilityResponse);
 }
 
-message ProductIdRequest{
-  repeated int64 product_ids = 1;
-}
-
-message ProductAvailability {
+message Product{
   int64 product_id = 1;
-  bool isProductAvailability = 2;
+  int64 quantity = 2;
+}
+
+message ProductsRequest{
+  repeated Product products = 1;
+}
+
+message AvailableProducts {
+  int64 product_id = 1;
   string name = 3;
   int64 quantity = 4;
   double price = 5;
   double sale = 6;
 }
 
+message UnavailableProducts {
+  int64 product_id = 1;
+  string reason = 2;
+  int64 requestedQuantity = 3;
+  int64 availableQuantity = 4;
+}
 
 message ProductsAvailabilityResponse {
-  repeated ProductAvailability products = 1;
+  repeated AvailableProducts availableProducts = 1;
+  repeated UnavailableProducts unavailableProducts = 2;
 }
 

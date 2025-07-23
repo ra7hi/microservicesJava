@@ -1,19 +1,12 @@
 package microservices.order_processing.order_service.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 
-@Getter
-@Setter
+@Data
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
 public class ProductDto {
     private Long productId;
-    private Boolean productAvailability;
     private String name;
     private Double price;
     private Long quantity;

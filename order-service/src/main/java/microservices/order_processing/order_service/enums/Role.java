@@ -1,4 +1,4 @@
-package microservices.order_processing.order_service.entities;
+package microservices.order_processing.order_service.enums;
 
 import lombok.Getter;
 

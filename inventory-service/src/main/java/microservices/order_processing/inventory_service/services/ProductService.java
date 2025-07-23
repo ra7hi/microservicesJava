@@ -1,33 +1,29 @@
 package microservices.order_processing.inventory_service.services;
 
+import lombok.RequiredArgsConstructor;
+import microservices.order_processing.inventory_service.UnavalibleProductReasons;
 import microservices.order_processing.inventory_service.dto.ProductDto;
-import microservices.order_processing.inventory_service.entities.Product;
+import microservices.order_processing.inventory_service.entities.ProductEntity;
 import microservices.order_processing.inventory_service.exceptions.ProductNotFoundException;
-import microservices.order_processing.inventory_service.grpc.ProductAvailability;
+import microservices.order_processing.inventory_service.grpc.AvailableProducts;
+import microservices.order_processing.inventory_service.grpc.Product;
+import microservices.order_processing.inventory_service.grpc.UnavailableProducts;
 import microservices.order_processing.inventory_service.repositories.ProductRepository;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
 
-    @Autowired
-    public ProductService(ProductRepository productRepository) {
-        this.productRepository = productRepository;
-    }
-
     public ProductDto findProductById(long id) {
         ProductDto productDto = new ProductDto();
-        Optional<Product> product = productRepository.findById(id);
+        Optional<ProductEntity> product = productRepository.findById(id);
         if (product.isPresent()) {
             BeanUtils.copyProperties(product.get(), productDto);
         }
@@ -39,21 +35,21 @@ public class ProductService {
 
     public List<ProductDto> findAllProducts() {
         List<ProductDto> productDtos = new ArrayList<>();
-        productRepository.findAll().forEach(product -> productDtos.add(findProductById(product.getId())));
+        productRepository.findAll().forEach(productEntity -> productDtos.add(findProductById(productEntity.getId())));
         return productDtos;
     }
 
     public void createProduct (ProductDto productDto) {
-        Product product = new Product();
-        BeanUtils.copyProperties(productDto, product);
-        productRepository.save(product);
+        ProductEntity productEntity = new ProductEntity();
+        BeanUtils.copyProperties(productDto, productEntity);
+        productRepository.save(productEntity);
     }
 
     public void updateProduct (ProductDto productDto, Long product_id) {
         if(productRepository.findById(product_id).isPresent()) {
-            Product product = new Product();
-            BeanUtils.copyProperties(productDto, product);
-            productRepository.save(product);
+            ProductEntity productEntity = new ProductEntity();
+            BeanUtils.copyProperties(productDto, productEntity);
+            productRepository.save(productEntity);
         }
         else{
             throw new ProductNotFoundException("Product not found!");
@@ -69,25 +65,54 @@ public class ProductService {
         }
     }
 
-    public List<ProductAvailability> getProductsAvailability(List<Long> productIds) {
-        List<ProductAvailability> availabilities = new ArrayList<>();
+    public List<AvailableProducts> getAvailabilityProducts(List<Product> productList) {
+        List<AvailableProducts> availabilities = new ArrayList<>();
 
-        for (Long productId : productIds) {
-            Optional<Product> product = productRepository.findProductById(productId);
-            product.ifPresent(p -> availabilities.add(toProductAvailability(p)));
+        for (Product product : productList) {
+            Optional<ProductEntity> productEntity = productRepository.findProductById(product.getProductId());
+            if(productEntity.isPresent()){
+                if(productEntity.get().getAvailableQuantity() >= product.getQuantity()){
+                    availabilities.add(toProductAvailability(productEntity.get()));
+                }
+            }
         }
 
         return availabilities;
     }
 
-    private ProductAvailability toProductAvailability(Product product) {
-        return ProductAvailability.newBuilder()
-                .setProductId(product.getId())
-                .setIsProductAvailability(product.getQuantity() > 0)
-                .setName(product.getName())
-                .setQuantity(product.getQuantity())
-                .setPrice(product.getPrice())
-                .setSale(product.getSale())
+    public List<UnavailableProducts> getUnavalabilityProducts(List<Product> productList) {
+        List<UnavailableProducts> unavailabilities = new ArrayList<>();
+        for (Product product : productList) {
+            Optional<ProductEntity> productEntity = productRepository.findProductById(product.getProductId());
+            if(productEntity.isEmpty()){
+                unavailabilities.add(toProductsUnavalability(product.getProductId(),
+                        UnavalibleProductReasons.NOT_FOUND.toString(),
+                        product.getQuantity(), 0L));
+            } else if (productEntity.get().getAvailableQuantity() < product.getQuantity()) {
+                unavailabilities.add(toProductsUnavalability(product.getProductId(),
+                        UnavalibleProductReasons.INSUFFICIENT_QUANTITY.toString(),
+                        product.getQuantity(), productEntity.get().getAvailableQuantity()));
+            }
+        }
+        return unavailabilities;
+    }
+
+    private UnavailableProducts toProductsUnavalability(Long id, String reason, Long requestedQuantity, Long availableQuantity) {
+        return UnavailableProducts.newBuilder()
+                .setProductId(id)
+                .setReason(reason)
+                .setRequestedQuantity(requestedQuantity)
+                .setAvailableQuantity(availableQuantity)
+                .build();
+    }
+
+    private AvailableProducts toProductAvailability(ProductEntity productEntity) {
+        return AvailableProducts.newBuilder()
+                .setProductId(productEntity.getId())
+                .setName(productEntity.getName())
+                .setQuantity(productEntity.getAvailableQuantity())
+                .setPrice(productEntity.getPrice())
+                .setSale(productEntity.getSale())
                 .build();
     }
 }

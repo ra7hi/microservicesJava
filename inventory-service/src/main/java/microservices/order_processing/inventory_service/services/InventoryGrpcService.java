@@ -1,34 +1,34 @@
 package microservices.order_processing.inventory_service.services;
 
 import io.grpc.stub.StreamObserver;
-import microservices.order_processing.inventory_service.grpc.ProductAvailability;
-import microservices.order_processing.inventory_service.grpc.ProductIdRequest;
+import lombok.RequiredArgsConstructor;
+import microservices.order_processing.inventory_service.grpc.AvailableProducts;
 import microservices.order_processing.inventory_service.grpc.ProductsAvailabilityResponse;
-import org.springframework.beans.factory.annotation.Autowired;
+import microservices.order_processing.inventory_service.grpc.ProductsRequest;
+import microservices.order_processing.inventory_service.grpc.UnavailableProducts;
 import org.springframework.grpc.server.service.GrpcService;
 
 import java.util.List;
 
 @GrpcService
+@RequiredArgsConstructor
 public class InventoryGrpcService extends microservices.order_processing.inventory_service.grpc.
         OrderServiceGrpc.OrderServiceImplBase {
 
     private final ProductService productService;
 
-    @Autowired
-    public InventoryGrpcService(ProductService productService) {
-        this.productService = productService;
-    }
-
     @Override
-    public void checkProductAvailability(ProductIdRequest request,
+    public void checkProductAvailability(ProductsRequest request,
                                          StreamObserver<ProductsAvailabilityResponse> responseObserver) {
 
-        List<ProductAvailability> productAvailabilities =
-                productService.getProductsAvailability(request.getProductIdsList());
+        List<AvailableProducts> availabilityProducts =
+                productService.getAvailabilityProducts(request.getProductsList());
+        List<UnavailableProducts> unavailableProducts =
+                productService.getUnavalabilityProducts(request.getProductsList());
 
         ProductsAvailabilityResponse response = ProductsAvailabilityResponse.newBuilder()
-                .addAllProducts(productAvailabilities)
+                .addAllAvailableProducts(availabilityProducts)
+                .addAllUnavailableProducts(unavailableProducts)
                 .build();
 
         responseObserver.onNext(response);

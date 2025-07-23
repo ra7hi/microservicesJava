@@ -1,15 +1,15 @@
 package microservices.order_processing.order_service.services;
 
+import lombok.RequiredArgsConstructor;
 import microservices.order_processing.order_service.utils.NullPropertyNames;
 import microservices.order_processing.order_service.controllers.requests.RegisterRequest;
 import microservices.order_processing.order_service.dto.UserDto;
-import microservices.order_processing.order_service.entities.Role;
+import microservices.order_processing.order_service.enums.Role;
 import microservices.order_processing.order_service.entities.Users;
 import microservices.order_processing.order_service.exception.RegistrationException;
 import microservices.order_processing.order_service.exception.UserNotFoundException;
 import microservices.order_processing.order_service.repository.UsersRepository;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,16 +19,12 @@ import java.util.Set;
 
 @Service
 @Transactional
-public class UsersService {
+@RequiredArgsConstructor
+public class UsersServiceImp implements UserService {
     private final UsersRepository usersRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    public UsersService(UsersRepository usersRepository, PasswordEncoder passwordEncoder) {
-        this.usersRepository = usersRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
-
+    @Override
     public void registerUser(RegisterRequest registerRequest, Set<Role> roles) {
         if (usersRepository.findByUsername(registerRequest.getUsername()).isPresent()) {
             throw new RegistrationException("Username is already taken!");
@@ -47,6 +43,7 @@ public class UsersService {
         usersRepository.save(user);
     }
 
+    @Override
     public void createUser(UserDto userDto) {
         if (usersRepository.findByUsername(userDto.getUsername()).isPresent()) {
             throw new RegistrationException("Username is already taken!");
@@ -63,6 +60,7 @@ public class UsersService {
 
     }
 
+    @Override
     public void updateUser(String username, UserDto userDto) {
         Optional<Users> user = usersRepository.findByUsername(username);
         if(user.isPresent()) {
@@ -83,6 +81,7 @@ public class UsersService {
         usersRepository.save(user.get());
     }
 
+    @Override
     public void deleteUser(String username) {
         Optional<Users> user = usersRepository.findByUsername(username);
         if(user.isPresent()) {
@@ -93,10 +92,12 @@ public class UsersService {
         }
     }
 
+    @Override
     public Optional<Users> findUserByUsername(String username) {
         return usersRepository.findByUsername(username);
     }
 
+    @Override
     public Optional<Users> findUserByEmail(String email) {
         return usersRepository.findByEmail(email);
     }

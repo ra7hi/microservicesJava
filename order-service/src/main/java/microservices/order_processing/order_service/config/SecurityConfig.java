@@ -1,8 +1,8 @@
 package microservices.order_processing.order_service.config;
 
+import lombok.RequiredArgsConstructor;
 import microservices.order_processing.order_service.jwt.JwtAuthenticationFilter;
-import microservices.order_processing.order_service.services.CustomUserDetailsService;
-import org.springframework.beans.factory.annotation.Autowired;
+import microservices.order_processing.order_service.services.CustomUserDetailsServiceImp;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,16 +21,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final CustomUserDetailsService customUserDetailsService;
+    private final CustomUserDetailsServiceImp customUserDetailsServiceImp;
     private final JwtAuthenticationEntryPoint unauthorizedHandler;
-
-    @Autowired
-    public SecurityConfig(CustomUserDetailsService customUserDetailsService, JwtAuthenticationEntryPoint unauthorizedHandler) {
-        this.customUserDetailsService = customUserDetailsService;
-        this.unauthorizedHandler = unauthorizedHandler;
-    }
 
 
     @Bean
@@ -52,7 +47,7 @@ public class SecurityConfig {
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(customUserDetailsService);
+        authProvider.setUserDetailsService(customUserDetailsServiceImp);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }

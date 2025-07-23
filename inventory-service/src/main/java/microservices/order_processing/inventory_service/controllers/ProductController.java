@@ -1,11 +1,8 @@
 package microservices.order_processing.inventory_service.controllers;
 
+import lombok.RequiredArgsConstructor;
 import microservices.order_processing.inventory_service.dto.ProductDto;
-import microservices.order_processing.inventory_service.entities.Product;
 import microservices.order_processing.inventory_service.services.ProductService;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,14 +16,10 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 
 @RestController
 @RequestMapping("/api/products")
+@RequiredArgsConstructor
 public class ProductController {
 
     private final ProductService productService;
-
-    @Autowired
-    public ProductController(ProductService productService) {
-        this.productService = productService;
-    }
 
     @GetMapping
     public ResponseEntity<?> getProducts(){

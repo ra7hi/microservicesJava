@@ -2,36 +2,37 @@ package microservices.order_processing.order_service.grpc;
 
 import io.grpc.StatusRuntimeException;
 import lombok.RequiredArgsConstructor;
+import microservices.order_processing.order_service.controllers.requests.OrderRequest;
+import microservices.order_processing.order_service.controllers.responses.OrderResponse;
 import microservices.order_processing.order_service.dto.ProductDto;
+import microservices.order_processing.order_service.grpc.components.InventoryMapper;
 import org.springframework.stereotype.Service;
+import microservices.order_processing.order_service.controllers.requests.ProductOdrer;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class InventoryServiceClient {
 
     private final OrderServiceGrpc.OrderServiceBlockingStub inventoryServiceStub;
+    private final InventoryMapper inventoryMapper;
 
-    public List<ProductDto> checkProductsAvailability(List<Long> productIds) {
+    public OrderResponse checkProductsAvailability(OrderRequest orderRequest) {
+        List<Product> productList = new ArrayList<>();
+        for(ProductOdrer productOdrer : orderRequest.getProductsRequest()){
+            Product product = Product.newBuilder().setProductId(productOdrer.getProductId())
+                    .setQuantity(productOdrer.getQuantity()).build();
+            productList.add(product);
+        }
         try {
-            ProductIdRequest request = ProductIdRequest.newBuilder()
-                    .addAllProductIds(productIds)
+            ProductsRequest request = ProductsRequest.newBuilder()
+                    .addAllProducts(productList)
                     .build();
 
             ProductsAvailabilityResponse response = inventoryServiceStub.checkProductAvailability(request);
-
-            return response.getProductsList().stream().map(product ->
-                    ProductDto.builder()
-                            .productId(product.getProductId())
-                            .productAvailability(product.getIsProductAvailability())
-                            .price(product.getPrice())
-                            .name(product.getName())
-                            .sale(product.getSale())
-                            .quantity(product.getQuantity())
-                            .build()
-                    ).collect(Collectors.toList());
+            return inventoryMapper.buildFinalOrder(response);
 
         } catch (StatusRuntimeException e) {
             throw new RuntimeException("Failed to check product availability: " + e.getMessage(), e);

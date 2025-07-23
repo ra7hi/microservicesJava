@@ -1,9 +1,10 @@
 package microservices.order_processing.order_service.controllers;
 
+import lombok.RequiredArgsConstructor;
 import microservices.order_processing.order_service.controllers.requests.OrderRequest;
+import microservices.order_processing.order_service.controllers.responses.OrderResponse;
 import microservices.order_processing.order_service.impl.UserDetailsImpl;
-import microservices.order_processing.order_service.services.OrderService;
-import org.springframework.beans.factory.annotation.Autowired;
+import microservices.order_processing.order_service.services.OrderServiceImp;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -14,19 +15,20 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/order")
+@RequiredArgsConstructor
 public class OrderController {
 
-    private final OrderService orderService;
-
-    @Autowired
-    public OrderController(OrderService orderService) {
-        this.orderService = orderService;
-    }
+    private final OrderServiceImp orderServiceImp;
 
     @PostMapping
     public ResponseEntity<?> createOrder(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                          @RequestBody OrderRequest orderRequest) {
-        orderService.processOrderCreation(userDetails.getUsername(), orderRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Order created successfully");
+        OrderResponse orderResponse = orderServiceImp.processOrderCreation(userDetails.getUsername(), orderRequest);
+        if(orderResponse.isCreared()) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(orderResponse);
+        }
+        else{
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(orderResponse);
+        }
     }
 }
