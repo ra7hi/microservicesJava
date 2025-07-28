@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ProductOdrer {
+public class ProductOdrerRequest {
     @NotNull(message = "productId cannot be null")
     Long productId;
 
