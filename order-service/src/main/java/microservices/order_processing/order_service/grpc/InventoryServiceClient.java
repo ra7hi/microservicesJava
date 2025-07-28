@@ -4,10 +4,9 @@ import io.grpc.StatusRuntimeException;
 import lombok.RequiredArgsConstructor;
 import microservices.order_processing.order_service.controllers.requests.OrderRequest;
 import microservices.order_processing.order_service.controllers.responses.OrderResponse;
-import microservices.order_processing.order_service.dto.ProductDto;
 import microservices.order_processing.order_service.grpc.components.InventoryMapper;
 import org.springframework.stereotype.Service;
-import microservices.order_processing.order_service.controllers.requests.ProductOdrer;
+import microservices.order_processing.order_service.controllers.requests.ProductOrderRequest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,9 +20,9 @@ public class InventoryServiceClient {
 
     public OrderResponse checkProductsAvailability(OrderRequest orderRequest) {
         List<Product> productList = new ArrayList<>();
-        for(ProductOdrer productOdrer : orderRequest.getProductsRequest()){
-            Product product = Product.newBuilder().setProductId(productOdrer.getProductId())
-                    .setQuantity(productOdrer.getQuantity()).build();
+        for(ProductOrderRequest productOrderRequest : orderRequest.getProductsRequest()){
+            Product product = Product.newBuilder().setProductId(productOrderRequest.getProductId())
+                    .setQuantity(productOrderRequest.getQuantity()).build();
             productList.add(product);
         }
         try {

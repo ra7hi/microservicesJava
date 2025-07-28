@@ -32,7 +32,6 @@ public class InventoryMapper {
                                 .build())
                 .collect(Collectors.toList());
         return OrderResponse.builder()
-                .isCreared(unavailableProductDtos.isEmpty())
                 .availableProducts(productDtos)
                 .unavailableProducts(unavailableProductDtos)
                 .build();

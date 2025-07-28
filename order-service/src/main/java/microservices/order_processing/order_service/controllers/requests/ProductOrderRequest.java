@@ -5,9 +5,15 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * DTO-запрос для добавления продукта в заказ.
+ * Используется при создании или обновлении заказа пользователем.
+ * Содержит ID продукта и его количество.
+ * Валидируется через Bean Validation.
+ */
 @Getter
 @Setter
-public class ProductOdrerRequest {
+public class ProductOrderRequest {
     @NotNull(message = "productId cannot be null")
     Long productId;
 

@@ -25,6 +25,12 @@ import org.hibernate.annotations.OnDeleteAction;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Сущность пользователя в системе.
+ * Включает id-пользователя, имя пользователя, пароль, электронную почту и список ролей
+ *  Пароль не сериализуется в JSON-ответах благодаря аннотации {@link JsonIgnore}.
+ *  Роли загружаются сразу (eager fetch) и связаны через отдельную таблицу user_roles.
+ */
 @Entity
 @Data
 @NoArgsConstructor
@@ -45,6 +51,11 @@ public class Users {
     @Column(unique = true, nullable = false)
     private String email;
 
+    /**
+     * Список ролей пользователя.
+     * Хранится в виде значений в другой таблице (user_roles) в соответствии с id-пользователя
+     * При удалении пользователя роли удаляются каскадно.
+     */
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Column(nullable = false)

@@ -4,7 +4,11 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
-
+/**
+ * Запрос для аутентификации пользователя
+ * Содержит имя пользователя и пароль, необходимые для входа
+ * Валидируется с помощью аннотаций Bean Validation.
+ */
 @Getter
 @Setter
 public class LoginRequest {

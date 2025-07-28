@@ -6,6 +6,12 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * DTO-запрос для регистрации нового пользователя.
+ * <p>
+ * Содержит имя пользователя, email и пароль.
+ * Валидируется через Bean Validation.
+ */
 @Getter
 @Setter
 public class RegisterRequest {

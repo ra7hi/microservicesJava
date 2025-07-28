@@ -9,6 +9,11 @@ import microservices.order_processing.order_service.enums.Role;
 
 import java.util.Set;
 
+/**
+ * DTO-класс для передачи данных пользователя.
+ * Содержит коючевые поля: имя пользователя, электронную почту, пароль и список ролей.
+ * Включает валидацию для полей через BeanValidation
+ */
 @Getter
 @Setter
 public class UserDto {

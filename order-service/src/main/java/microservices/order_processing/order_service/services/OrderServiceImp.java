@@ -4,26 +4,29 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import microservices.order_processing.order_service.controllers.requests.OrderRequest;
 import microservices.order_processing.order_service.controllers.responses.OrderResponse;
+import microservices.order_processing.order_service.controllers.responses.OrderStatusResponse;
 import microservices.order_processing.order_service.dto.InventoryReservationDto;
 import microservices.order_processing.order_service.dto.OrderDto;
 import microservices.order_processing.order_service.dto.ProductDto;
 import microservices.order_processing.order_service.entities.SagaState;
+import microservices.order_processing.order_service.entities.Users;
+import microservices.order_processing.order_service.enums.OrderStatus;
 import microservices.order_processing.order_service.enums.SagaStatus;
 import microservices.order_processing.order_service.exception.UserNotFoundException;
 import microservices.order_processing.order_service.grpc.InventoryServiceClient;
 import microservices.order_processing.order_service.kafka.KafkaProducerService;
 import microservices.order_processing.order_service.repository.SagaStateRepository;
 import microservices.order_processing.order_service.repository.UsersRepository;
-import microservices.order_processing.order_service.saga.ProductReservation;
 import microservices.order_processing.order_service.saga.SagaEvent;
 import microservices.order_processing.order_service.services.components.OrderMapper;
+import microservices.order_processing.order_service.services.components.ProductDtoToProductReservationMapper;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +38,8 @@ public class OrderServiceImp implements OrderService {
     private final KafkaProducerService kafkaProducerService;
     private final OrderMapper orderMapper;
     private final SagaStateRepository sagaStateRepository;
+    private final ProductDtoToProductReservationMapper productDtoToProductReservationMapper;
+    private final UsersServiceImp userServiceImp;
 
     @Override
     public OrderResponse processOrderCreation(String username, OrderRequest orderRequest) {
@@ -49,6 +54,7 @@ public class OrderServiceImp implements OrderService {
         OrderResponse orderResponse = inventoryServiceClient.checkProductsAvailability(orderRequest);
 
         if(!orderResponse.getUnavailableProducts().isEmpty()){
+            orderResponse.setOrderStatus(OrderStatus.FAILED);
             return orderResponse;
         }
 
@@ -56,20 +62,13 @@ public class OrderServiceImp implements OrderService {
         sagaStateRepository.save(sagaState);
 
         InventoryReservationDto reservationDto = new InventoryReservationDto(
-                sagaId, orderId, mapToProductReservations(orderResponse.getAvailableProducts()));
+                sagaId, orderId, productDtoToProductReservationMapper.mapToProductReservations(orderResponse.getAvailableProducts()));
 
         SagaEvent sagaEvent = new SagaEvent(sagaId, "inventory.reserve", SagaStatus.STARTED, reservationDto, null);
         kafkaProducerService.sendSagaEvent(sagaEvent);
 
+        orderResponse.setOrderStatus(OrderStatus.PENDING);
         return orderResponse;
-    }
-
-    private List<ProductReservation> mapToProductReservations(List<ProductDto> availableProducts) {
-        return availableProducts.stream().map(productDto ->
-                ProductReservation.builder()
-                        .productId(productDto.getProductId())
-                        .quantity(productDto.getQuantity())
-                        .build()).collect(Collectors.toList());
     }
 
     @KafkaListener(topics = "saga-events", groupId = "order-service-saga-group")
@@ -138,5 +137,23 @@ public class OrderServiceImp implements OrderService {
         sagaStateRepository.save(sagaState);
 
         log.info("Saga compensated: {}", sagaEvent.getSagaId());
+    }
+
+    public OrderStatusResponse getOrderStatus(String username, String OrderId) {
+        Optional<Users> user = userServiceImp.findUserByUsername(username);
+        if(user.isEmpty()){
+            throw new UserNotFoundException("User not found!");
+        }
+        SagaState sagaState = sagaStateRepository.findByOrderIdAndUserId(OrderId, user.get().getId());
+        switch (sagaState.getStatus()) {
+            case INVENTORY_RESERVED:
+                return OrderStatusResponse.builder().orderStatus(OrderStatus.PENDING).build();
+            case COMPENSATING:
+                case COMPENSATED:
+                    return OrderStatusResponse.builder().orderStatus(OrderStatus.FAILED).build();
+            case COMPLETED:
+                return OrderStatusResponse.builder().orderStatus(OrderStatus.CREATED).build();
+                default: return OrderStatusResponse.builder().orderStatus(OrderStatus.PENDING).build();
+        }
     }
 }

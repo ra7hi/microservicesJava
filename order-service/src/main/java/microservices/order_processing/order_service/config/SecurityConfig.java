@@ -27,23 +27,45 @@ public class SecurityConfig {
     private final CustomUserDetailsServiceImp customUserDetailsServiceImp;
     private final JwtAuthenticationEntryPoint unauthorizedHandler;
 
-
+    /**
+     * Шифратор паролей, использующий BCrypt.
+     *
+     * @return экземпляр {@link PasswordEncoder}
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Менеджер аутентификации, используемый Spring Security.
+     *
+     * @param authConfig конфигурация аутентификации
+     * @return {@link AuthenticationManager}
+     * @throws Exception при ошибке создания менеджера
+     */
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
     }
 
+    /**
+     * Фильтр аутентификации по JWT, добавляется в цепочку фильтров.
+     *
+     * @return экземпляр {@link JwtAuthenticationFilter}
+     */
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
         return new JwtAuthenticationFilter();
     }
 
+    /**
+     * Конфигурация провайдера аутентификации с использованием
+     * кастомного сервиса пользователей и BCrypt.
+     *
+     * @return {@link DaoAuthenticationProvider}
+     */
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -51,6 +73,7 @@ public class SecurityConfig {
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

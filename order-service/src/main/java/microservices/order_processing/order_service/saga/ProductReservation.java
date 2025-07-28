@@ -5,6 +5,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * DTO-класс, описывающий резервирование конкретного продукта.
+ * Содержит идентификатор продукта и количество единиц для резервации.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

@@ -4,6 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Универсальный ответ API для операций, не возвращающих объект.
+ * Содержит флаг успешности выполнения и сообщение.
+ */
 @Getter
 @Setter
 @AllArgsConstructor
