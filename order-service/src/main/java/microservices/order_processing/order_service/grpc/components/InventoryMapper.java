@@ -9,8 +9,18 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Компонент для преобразования данных из gRPC-ответа о доступности товаров
+ * в DTO-ответ, пригодный для возврата клиенту REST API.
+ */
 @Component
 public class InventoryMapper {
+    /**
+     * Собирает финальный ответ заказа на основе ответа от inventory-service.
+     *
+     * @param productsAvailabilityResponse ответ от gRPC-сервиса о доступных и недоступных товарах
+     * @return {@link OrderResponse}, содержащий списки доступных и недоступных товаров
+     */
     public OrderResponse buildFinalOrder(ProductsAvailabilityResponse productsAvailabilityResponse) {
         List<ProductDto> productDtos = productsAvailabilityResponse.getAvailableProductsList().stream().map(product ->
                 ProductDto.builder()

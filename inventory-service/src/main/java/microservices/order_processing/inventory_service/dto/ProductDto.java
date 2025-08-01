@@ -10,6 +10,11 @@ import lombok.Data;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
+/**
+ * DTO-класс, представляющий продукт в сервисе инвентаря.
+ * <p>Используется при создании, обновлении и валидации данных о продукте.
+ * <p>Все поля снабжены аннотациями валидации Bean Validation для обеспечения корректности данных.</p>
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

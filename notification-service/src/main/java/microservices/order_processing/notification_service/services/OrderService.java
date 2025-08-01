@@ -10,9 +10,14 @@ import microservices.order_processing.notification_service.services.components.O
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
+/**
+ * Сервис создания заказа и чтения информации о них.
+ * Создает заказ на основе переданного {@link OrderDto}
+ * Предоставляет методы для чтения заказов (всех, по идентификатору заказа, по идентификатору пользователя)
+ */
 @Service
 @RequiredArgsConstructor
 public class OrderService {
@@ -20,6 +25,11 @@ public class OrderService {
     private final OrderDtoToOrderItemsDtoMapper orderDtoToOrderItemsDtoMapper;
     private final OrderItemsDtoToOrderItemsMapper orderItemsDtoToOrderItemsMapper;
 
+    /**
+     * Сохраняет заказ в БД, предварительно вызвав несколько преобразователей
+     * @param dto DTO представления информации о заказе
+     * @return сущность сохраненного заказа
+     */
     public Order saveOrder(OrderDto dto) {
         Set<OrderItems> orderItems = orderItemsDtoToOrderItemsMapper.toOrderItems(
                 orderDtoToOrderItemsDtoMapper.toOrderItemsDto(dto));
@@ -35,14 +45,28 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
+    /**
+     * Возвращает все заказы
+     * @return список сущностей Заказа
+     */
     public List<Order> getAllOrders(){
         return orderRepository.findAll();
     }
 
-    public List<Order> getAllOrdersByOrderId(String orderId){
-        return orderRepository.findOrdersById(orderId);
+    /**
+     * Возвращает заказ по идентификатору
+     * @param orderId идентификатор заказа
+     * @return сущность найденного заказа
+     */
+    public Optional<Order> getOrderByOrderId(String orderId){
+        return orderRepository.findOrderById(orderId);
     }
 
+    /**
+     * Возвращает все заказы пользователя
+     * @param userId идентификатор пользователя
+     * @return список сущностей Заказа пользователя
+     */
     public List<Order> getAllOrdersByUserId(Long userId){
         return orderRepository.findOrdersByUserId(userId);
     }

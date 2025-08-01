@@ -1,7 +1,12 @@
 package microservices.order_processing.notification_service.dto;
 
-import lombok.*;
+import lombok.Data;
+import lombok.Builder;
 
+/**
+ * DTO-класс, представляющий продукт.
+ * Используется в составе заказа при его сохранении.
+ */
 @Data
 @Builder
 public class ProductDto {

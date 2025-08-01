@@ -17,6 +17,10 @@ import org.springframework.kafka.support.serializer.JsonSerializer;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Конфигурация Kafka для inventory-сервиса.
+ * <p>Настраивает фабрики продюсеров и консьюмеров, сериализацию/десериализацию и listener-контейнер для обработки событий саги {@link SagaEvent}.</p>
+ */
 @Configuration
 public class KafkaConfig {
     @Value("${spring.kafka.bootstrap-servers}")
@@ -25,6 +29,11 @@ public class KafkaConfig {
     @Value("${spring.kafka.consumer.group-id}")
     private String groupId;
 
+    /**
+     * Конфигурация фабрики Kafka-производителей.
+     * Использует {@link JsonSerializer} для сериализации значений сообщений.
+     * @return ProducerFactory с настройками подключения и сериализации
+     */
     @Bean
     public ProducerFactory<String, Object> producerFactory() {
         Map<String, Object> configProps = new HashMap<>();
@@ -34,11 +43,23 @@ public class KafkaConfig {
         return new DefaultKafkaProducerFactory<>(configProps);
     }
 
+    /**
+     * Создаёт {@link KafkaTemplate} для отправки сообщений в Kafka.
+     * <p>
+     * Использует фабрику продюсеров с преднастроенными параметрами.
+     *
+     * @return экземпляр {@link KafkaTemplate}
+     */
     @Bean
     public KafkaTemplate<String, Object> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
 
+    /**
+     * Конфигурация фабрики Kafka-консьюмеров.
+     * <p>Использует {@link JsonDeserializer} для десериализации событий {@link SagaEvent} с защитой от ошибок через {@link ErrorHandlingDeserializer}.</p>
+     * @return ConsumerFactory с настройками подключения и обработки сериализации
+     */
     @Bean
     public ConsumerFactory<String, SagaEvent> consumerFactory() {
         JsonDeserializer<SagaEvent> deserializer = new JsonDeserializer<>(SagaEvent.class);
@@ -56,6 +77,11 @@ public class KafkaConfig {
                 new ErrorHandlingDeserializer<>(deserializer));
     }
 
+    /**
+     * Фабрика контейнеров слушателей Kafka.
+     * <p>Используется для аннотированных методов {@code @KafkaListener}, обрабатывающих события {@link SagaEvent}.</p>
+     * @return настроенный контейнерный фабричный бин
+     */
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, SagaEvent> kafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, SagaEvent> factory =

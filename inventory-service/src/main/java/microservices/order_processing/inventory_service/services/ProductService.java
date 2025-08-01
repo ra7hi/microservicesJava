@@ -1,7 +1,7 @@
 package microservices.order_processing.inventory_service.services;
 
 import lombok.RequiredArgsConstructor;
-import microservices.order_processing.inventory_service.UnavalibleProductReasons;
+import microservices.order_processing.inventory_service.enums.UnavalibleProductReasons;
 import microservices.order_processing.inventory_service.dto.ProductDto;
 import microservices.order_processing.inventory_service.entities.ProductEntity;
 import microservices.order_processing.inventory_service.exceptions.ProductNotFoundException;
@@ -16,6 +16,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Сервис для управления товарами.
+ * Реализует CRUD операции и методы для проверки доступности товаров.
+ */
 @Service
 @RequiredArgsConstructor
 public class ProductService {
@@ -65,6 +69,12 @@ public class ProductService {
         }
     }
 
+    /**
+     * Получает список доступных продуктов из переданного списка.
+     *
+     * @param productList список продуктов для проверки
+     * @return список доступных продуктов с деталями {@link AvailableProducts}
+     */
     public List<AvailableProducts> getAvailabilityProducts(List<Product> productList) {
         List<AvailableProducts> availabilities = new ArrayList<>();
 
@@ -80,6 +90,12 @@ public class ProductService {
         return availabilities;
     }
 
+    /**
+     * Получает список недоступных продуктов из переданного списка
+     *
+     * @param productList список продуктов для проверки
+     * @return список недоступных продуктов с причиной {@link UnavailableProducts}
+     */
     public List<UnavailableProducts> getUnavalabilityProducts(List<Product> productList) {
         List<UnavailableProducts> unavailabilities = new ArrayList<>();
         for (Product product : productList) {
@@ -97,6 +113,14 @@ public class ProductService {
         return unavailabilities;
     }
 
+    /**
+     * Создает объект UnavailableProducts с указанием причины отсутствия
+     * @param id идентификатор продукта
+     * @param reason причина
+     * @param requestedQuantity запрашиваемое количество продукта
+     * @param availableQuantity фактически доступное количество продукта
+     * @return {@link UnavailableProducts}
+     */
     private UnavailableProducts toProductsUnavalability(Long id, String reason, Long requestedQuantity, Long availableQuantity) {
         return UnavailableProducts.newBuilder()
                 .setProductId(id)
@@ -106,6 +130,11 @@ public class ProductService {
                 .build();
     }
 
+    /**
+     * Преобразует сущность продукта в объект доступного продукта с деталями
+     * @param productEntity
+     * @return {@link AvailableProducts}
+     */
     private AvailableProducts toProductAvailability(ProductEntity productEntity) {
         return AvailableProducts.newBuilder()
                 .setProductId(productEntity.getId())

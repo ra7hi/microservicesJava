@@ -17,6 +17,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * Реализация интерфейса {@link UserService}:
+ * регистрация, создание, обновление, удаление, а также поиск по имени пользователя и email.
+ *
+ * <p>Все методы помечены транзакционными аннотациями для обеспечения согласованности данных.</p>
+ */
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -24,6 +30,13 @@ public class UsersServiceImp implements UserService {
     private final UsersRepository usersRepository;
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * Регистрирует нового пользователя на основе регистрационного запроса и заданных ролей.
+     *
+     * @param registerRequest объект, содержащий данные для регистрации (имя пользователя, email, пароль)
+     * @param roles набор ролей, назначаемых пользователю
+     * @throws RegistrationException если имя пользователя или email уже заняты
+     */
     @Override
     public void registerUser(RegisterRequest registerRequest, Set<Role> roles) {
         if (usersRepository.findByUsername(registerRequest.getUsername()).isPresent()) {
@@ -43,6 +56,12 @@ public class UsersServiceImp implements UserService {
         usersRepository.save(user);
     }
 
+    /**
+     * Создает нового пользователя на основе DTO. Пароль будет зашифрован.
+     *
+     * @param userDto DTO с данными пользователя
+     * @throws RegistrationException если имя пользователя или email уже заняты
+     */
     @Override
     public void createUser(UserDto userDto) {
         if (usersRepository.findByUsername(userDto.getUsername()).isPresent()) {
@@ -60,6 +79,15 @@ public class UsersServiceImp implements UserService {
 
     }
 
+    /**
+     * Обновляет существующего пользователя, найденного по имени пользователя.
+     * При этом игнорируются {@code null}-поля в DTO.
+     *
+     * @param username имя пользователя, чьи данные нужно обновить
+     * @param userDto DTO с новыми данными пользователя
+     * @throws UserNotFoundException если пользователь не найден
+     * @throws RegistrationException если новое имя пользователя или email уже заняты другими пользователями
+     */
     @Override
     public void updateUser(String username, UserDto userDto) {
         Optional<Users> user = usersRepository.findByUsername(username);
@@ -81,6 +109,12 @@ public class UsersServiceImp implements UserService {
         usersRepository.save(user.get());
     }
 
+    /**
+     * Удаляет пользователя по его username.
+     *
+     * @param username имя пользователя
+     * @throws UserNotFoundException если пользователь не найден
+     */
     @Override
     public void deleteUser(String username) {
         Optional<Users> user = usersRepository.findByUsername(username);
@@ -92,11 +126,23 @@ public class UsersServiceImp implements UserService {
         }
     }
 
+    /**
+     * Выполняет поиск пользователя по имени пользователя.
+     *
+     * @param username имя пользователя
+     * @return {@code Optional} с найденным пользователем или пустой, если пользователь не найден
+     */
     @Override
     public Optional<Users> findUserByUsername(String username) {
         return usersRepository.findByUsername(username);
     }
 
+    /**
+     * Выполняет поиск пользователя по email.
+     *
+     * @param email адрес электронной почты
+     * @return {@code Optional} с найденным пользователем или пустой, если пользователь не найден
+     */
     @Override
     public Optional<Users> findUserByEmail(String email) {
         return usersRepository.findByEmail(email);

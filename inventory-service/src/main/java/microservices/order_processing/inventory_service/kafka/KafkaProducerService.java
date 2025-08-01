@@ -10,6 +10,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Сервис для отправки событий саги в Kafka.
+ * <p>
+ * Использует {@link KafkaTemplate} для асинхронной отправки сообщений в топик,
+ * указанный в конфигурации.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -20,6 +26,16 @@ public class KafkaProducerService {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
+    /**
+     * Отправляет событие саги в Kafka в указанный топик.
+     * <p>
+     * Использует ключ сообщения, равный ID саги, для обеспечения корректной маршрутизации и
+     * упорядочивания сообщений по ключу.
+     * <p>
+     * Логирует успешную отправку или ошибку в случае неудачи.
+     *
+     * @param sagaEvent объект события саги для отправки
+     */
     public void sendSagaEvent(SagaEvent sagaEvent) {
         log.info("Sending saga event from inventory service: {}", sagaEvent);
 

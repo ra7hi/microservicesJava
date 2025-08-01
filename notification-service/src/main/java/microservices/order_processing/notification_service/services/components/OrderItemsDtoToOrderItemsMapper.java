@@ -7,8 +7,17 @@ import org.springframework.stereotype.Component;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Компонент формирования из DTO-класса {@link OrderItemsDto}, которое получаем после
+ * формирования списка объектов состава заказа из {@link OrderDtoToOrderItemsDtoMapper}
+ */
 @Component
 public class OrderItemsDtoToOrderItemsMapper {
+    /**
+     * Создает список сущностей элементов заказа из DTO представления состава заказа
+     * @param orders DTO представления элементов заказа
+     * @return список сущностей товаров
+     */
     public Set<OrderItems> toOrderItems(Set<OrderItemsDto> orders) {
         return orders.stream().map(orderItemDto ->
                  OrderItems.builder()

@@ -1,6 +1,13 @@
 package microservices.order_processing.inventory_service.entities;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Id;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Column;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,6 +15,11 @@ import microservices.order_processing.inventory_service.enums.ReservationStatus;
 
 import java.time.LocalDateTime;
 
+/**
+ * Сущность-класс, представляющий информацию о резервировании товара в рамках саги.
+ * <p>Используется в inventory-сервисе для отслеживания состояния резервации товара по уникальному идентификатору саги.</p>
+ * <p>Каждая запись соответствует одной попытке зарезервировать определённое количество продукта.</p>
+ */
 @Entity
 @Table(name = "reservations")
 @Data

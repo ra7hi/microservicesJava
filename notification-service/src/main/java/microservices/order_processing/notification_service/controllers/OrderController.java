@@ -26,7 +26,7 @@ public class OrderController {
 
     @GetMapping("/{order_id}")
     public ResponseEntity<?> getOrdersById(@PathVariable String order_id) {
-        return ResponseEntity.ok(orderService.getAllOrdersByOrderId(order_id));
+        return ResponseEntity.ok(orderService.getOrderByOrderId(order_id));
     }
 
     @GetMapping("/{user_id}")

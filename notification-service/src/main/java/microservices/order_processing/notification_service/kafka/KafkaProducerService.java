@@ -10,6 +10,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Сервис отправки сообщения в Kafka о результате сохранения заказа.
+ * Отправляет события в топик saga-events
+ * @see SagaEvent
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -20,6 +25,11 @@ public class KafkaProducerService {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
+    /**
+     * Отправляет событие саги в Kafka
+     * В качестве ключа используется идентификатор саги {@code sagaId}
+     * @param sagaEvent событие саги о результате сохранения заказа, которое необходимо опубликовать.
+     */
     public void sendSagaEvent(SagaEvent sagaEvent) {
         log.info("Sending saga event from notification service: {}", sagaEvent);
 

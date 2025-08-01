@@ -8,6 +8,11 @@ import microservices.order_processing.order_service.entities.Users;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * Интерфейс сервиса управления пользователями.
+ * Определяет контракт для CRUD (регистрации, создания, обновления и удаления пользователей),
+ * а также для поиска пользователя по имени или электронной почте.
+ */
 public interface UserService {
     void registerUser(RegisterRequest registerRequest, Set<Role> roles);
     void createUser(UserDto userDto);

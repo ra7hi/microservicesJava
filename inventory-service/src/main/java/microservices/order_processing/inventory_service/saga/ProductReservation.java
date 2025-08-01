@@ -5,6 +5,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * DTO для представления резервации продукта в рамках саги.
+ * Содержит идентификатор продукта и количество зарезервированного товара.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

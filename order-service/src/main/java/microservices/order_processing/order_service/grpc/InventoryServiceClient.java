@@ -11,6 +11,10 @@ import microservices.order_processing.order_service.controllers.requests.Product
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * gRPC-клиент для взаимодействия с Inventory Service.
+ * Выполняет проверку доступности товаров и преобразует результат в формат для REST-ответа.
+ */
 @Service
 @RequiredArgsConstructor
 public class InventoryServiceClient {
@@ -18,6 +22,13 @@ public class InventoryServiceClient {
     private final OrderServiceGrpc.OrderServiceBlockingStub inventoryServiceStub;
     private final InventoryMapper inventoryMapper;
 
+    /**
+     * Проверяет доступность товаров, запрошенных в заказе, через gRPC Inventory Service.
+     *
+     * @param orderRequest запрос на оформление заказа, содержащий список продуктов
+     * @return {@link OrderResponse} с доступными и недоступными товарами
+     * @throws RuntimeException если gRPC-вызов завершился с ошибкой
+     */
     public OrderResponse checkProductsAvailability(OrderRequest orderRequest) {
         List<Product> productList = new ArrayList<>();
         for(ProductOrderRequest productOrderRequest : orderRequest.getProductsRequest()){

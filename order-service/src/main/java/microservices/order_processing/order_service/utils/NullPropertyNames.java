@@ -7,6 +7,12 @@ import java.beans.PropertyDescriptor;
 import java.util.HashSet;
 import java.util.Set;
 
+
+/**
+ * Утилитарный класс, предоставляющий метод для определения имен свойств объекта, значение которых равно {@code null}.
+ * <p>Полезен при копировании свойств из одного объекта в другой, позволяя игнорировать {@code null}-поля и тем самым
+ * избегать перезаписи значений по умолчанию или существующих данных.</p>
+ */
 public class NullPropertyNames {
     public static String[] getNullPropertyNames(Object source) {
         final BeanWrapper src = new BeanWrapperImpl(source);

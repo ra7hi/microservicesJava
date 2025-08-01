@@ -7,16 +7,19 @@ import microservices.order_processing.notification_service.enums.SagaStatus;
 import microservices.order_processing.notification_service.saga.SagaEvent;
 import microservices.order_processing.notification_service.services.OrderService;
 import microservices.order_processing.notification_service.dto.OrderDto;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.support.KafkaHeaders;
-import org.springframework.messaging.handler.annotation.Header;
-import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.apache.kafka.common.requests.DeleteAclsResponse.log;
-
+/**
+ * Сервис Kafka-потребителя, обрабатывающий события саги, поступающие через Kafka.
+ * Принимает события типа {@code order.create}, инициирует,
+ * сохраняет заказа в БД и отправляет соответствующие события о статусе выполнения.
+ * Использует механизм обработки саг для согласованного взаимодействия микросервисов.
+ * Слушает Kafka-топик {@code saga-events}, группа — {@code notification-service-saga-group}.
+ * @see KafkaProducerService
+ * @see OrderService
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -25,7 +28,12 @@ public class KafkaConsumerService {
     private final OrderService orderService;
     private final KafkaProducerService kafkaProducerService;
 
-    // Слушатель для событий саги
+    /**
+     * Основной Kafka слушатель, обрабатывающий входящие события саги.
+     * В случае получения события типа {@code order.create} — инициирует создание заказа.
+     * Иначе — логгирует предупреждение о неизвестном типе события.
+     * @param sagaEvent объект события саги, десериализованный из Kafka-сообщения.
+     */
     @KafkaListener(topics = "saga-events",
             groupId = "notification-service-saga-group",
             containerFactory = "sagaKafkaListenerContainerFactory")
@@ -39,7 +47,13 @@ public class KafkaConsumerService {
         }
     }
 
-
+    /**
+     * Обрабатывает событие {@code order.create}.
+     * Выполняется сохранение заказа на основе переданных данных в саге и отправка события
+     * {@code order.created} при успехе или {@code order.creation.failed} при неудаче.
+     * Метод аннотирован {@code @Transactional}
+     * @param sagaEvent событие саги с данными о заказе.
+     */
     @Transactional
     public void handleOrderCreation(SagaEvent sagaEvent) {
         try {

@@ -28,6 +28,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Реализация сервиса обработки заказов.
+ * Отвечает за логику создания заказа, взаимодействие с инвентарем,
+ * управление сагами и их состояниями, а также обработку событий саги из Kafka.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -41,6 +46,14 @@ public class OrderServiceImp implements OrderService {
     private final ProductDtoToProductReservationMapper productDtoToProductReservationMapper;
     private final UsersServiceImp userServiceImp;
 
+    /**
+     * Создает и обрабатывает новый заказ для пользователя с указанным именем.
+     * Проверяет наличие товаров в inventory-service, инициирует процесс саги на резервирование товаров
+     * и сохранение состояния саги.
+     * @param username имя пользователя, создающего заказ
+     * @param orderRequest данные запроса на создание заказа
+     * @return ответ с информацией о статусе заказа и наличии товаров
+     */
     @Override
     public OrderResponse processOrderCreation(String username, OrderRequest orderRequest) {
         String sagaId = UUID.randomUUID().toString();
@@ -71,6 +84,12 @@ public class OrderServiceImp implements OrderService {
         return orderResponse;
     }
 
+    /**
+     * Обработчик событий саги из Kafka топика "saga-events".
+     * В зависимости от типа события вызывает соответствующие методы для обработки состояний саги.
+     *
+     * @param sagaEvent событие саги, полученное из Kafka
+     */
     @KafkaListener(topics = "saga-events", groupId = "order-service-saga-group")
     public void handleSagaEvents(SagaEvent sagaEvent) {
         log.info("Received saga event: {}", sagaEvent);
@@ -92,6 +111,11 @@ public class OrderServiceImp implements OrderService {
         }
     }
 
+    /**
+     * Обрабатывает успешное резервирование товаров в инвентаре.
+     * Обновляет состояние саги и инициирует создание заказа.
+     * @param sagaEvent событие "inventory.reserved"
+     */
     private void handleInventoryReserved(SagaEvent sagaEvent) {
         SagaState sagaState = sagaStateRepository.findBySagaId(sagaEvent.getSagaId());
         sagaState.setStatus(SagaStatus.INVENTORY_RESERVED);
@@ -107,6 +131,12 @@ public class OrderServiceImp implements OrderService {
                 sagaEvent.getSagaId(), "order.create", SagaStatus.INVENTORY_RESERVED, order, null);
         kafkaProducerService.sendSagaEvent(createOrderEvent);
     }
+
+    /**
+     * Обрабатывает успешное создание заказа, завершает сагу.
+     *
+     * @param sagaEvent событие "order.created"
+     */
     private void handleOrderCreated(SagaEvent sagaEvent) {
         // Заказ создан успешно, завершаем сагу
         SagaState sagaState = sagaStateRepository.findBySagaId(sagaEvent.getSagaId());
@@ -116,6 +146,13 @@ public class OrderServiceImp implements OrderService {
         log.info("Saga completed successfully: {}", sagaEvent.getSagaId());
     }
 
+
+    /**
+     * Обрабатывает неудачу в любой из фаз саги.
+     * Начинает процесс компенсации, если товары были зарезервированы — освобождает их.
+     *
+     * @param sagaEvent событие ошибки саги ("inventory.reservation.failed" или "order.creation.failed")
+     */
     private void handleSagaFailure(SagaEvent sagaEvent) {
         // Начинаем компенсацию
         SagaState sagaState = sagaStateRepository.findBySagaId(sagaEvent.getSagaId());
@@ -131,6 +168,11 @@ public class OrderServiceImp implements OrderService {
         }
     }
 
+    /**
+     * Обрабатывает успешную компенсацию саги, обновляет статус.
+     *
+     * @param sagaEvent событие "inventory.released"
+     */
     private void handleSagaCompensated(SagaEvent sagaEvent) {
         SagaState sagaState = sagaStateRepository.findBySagaId(sagaEvent.getSagaId());
         sagaState.setStatus(SagaStatus.COMPENSATED);
@@ -139,6 +181,15 @@ public class OrderServiceImp implements OrderService {
         log.info("Saga compensated: {}", sagaEvent.getSagaId());
     }
 
+
+    /**
+     * Получает статус заказа для пользователя по идентификатору заказа.
+     *
+     * @param username имя пользователя
+     * @param OrderId идентификатор заказа
+     * @return объект {@link OrderStatusResponse} с текущим статусом заказа
+     * @throws UserNotFoundException если пользователь с указанным именем не найден
+     */
     public OrderStatusResponse getOrderStatus(String username, String OrderId) {
         Optional<Users> user = userServiceImp.findUserByUsername(username);
         if(user.isEmpty()){

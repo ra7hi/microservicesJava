@@ -14,6 +14,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+/**
+ * Реализация сервиса аутентификации пользователей.
+ * Отвечает за проверку учетных данных, генерацию JWT токенов и обновление токенов доступа.
+ */
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImp implements AuthService {
@@ -22,6 +26,14 @@ public class AuthServiceImp implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
 
+    /**
+     * Аутентифицирует пользователя на основе логина и пароля.
+     * Генерирует JWT токен и возвращает информацию о пользователе вместе с токеном.
+     *
+     * @param loginRequest DTO с именем пользователя и паролем ({@link LoginRequest})
+     * @return объект с JWT токеном и данными пользователя ({@link JwtAuthenticationResponse})
+     * @throws org.springframework.security.core.AuthenticationException в случае неудачной аутентификации
+     */
     @Override
     public JwtAuthenticationResponse authenticateUser(LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
@@ -36,6 +48,15 @@ public class AuthServiceImp implements AuthService {
 
         return new JwtAuthenticationResponse(jwt, userDetails.getUser());
     }
+
+    /**
+     * Обновляет JWT токен доступа, используя переданный refresh токен.
+     * Проверяет валидность refresh токена, загружает пользователя и генерирует новый токен доступа.
+     *
+     * @param refreshToken строка с refresh токеном
+     * @return объект с новым JWT токеном доступа ({@link RefreshTokenResponse})
+     * @throws InvalidTokenException если токен недействителен или просрочен
+     */
 
     @Override
     public RefreshTokenResponse refreshAccessToken(String refreshToken) {

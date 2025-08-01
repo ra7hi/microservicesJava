@@ -21,6 +21,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Сервис получения событий из Kafka в топике saga-events и управления резервацией товаров в рамках саги.
+ * Публикует событие о статусе резервирования
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -30,6 +34,10 @@ public class InventoryReservationService {
     private final ReservationRepository reservationRepository;
     private final KafkaProducerService kafkaProducerService;
 
+    /**
+     * Обработка входящих событий саги из Kafka.
+     * @param sagaEvent событие саги из Kafka
+     */
     @KafkaListener(topics = "saga-events", groupId = "inventory-service-saga-group")
     public void handleSagaEvents(SagaEvent sagaEvent) {
         log.info("Inventory service received saga event: {}", sagaEvent);
@@ -47,6 +55,11 @@ public class InventoryReservationService {
         }
     }
 
+    /**
+     * Обрабатывает запрос на резервирование товаров.
+     * Создается запись о резервации и отправляет событие об успешном или провальном резервировании
+     * @param sagaEvent событие саги с данными резервирования
+     */
     @Transactional
     public void handleInventoryReservation(SagaEvent sagaEvent) {
         try {
@@ -92,6 +105,11 @@ public class InventoryReservationService {
         }
     }
 
+    /**
+     * Обрабатывает запрос снятия товара с резерва и увеличивает количество доступных товаров.
+     * Отправляет событие в Kafka об успешном освобождении зарезервированных товаров
+     * @param sagaEvent событие саги с запросом на освобождение
+     */
     @Transactional
     public void handleInventoryRelease(SagaEvent sagaEvent) {
         try {
@@ -119,6 +137,10 @@ public class InventoryReservationService {
         }
     }
 
+    /**
+     * Совершает окончательное списание товаров при получении события об успешном создании заказа
+     * @param sagaEvent событие саги с подтверждением создания заказа
+     */
     @Transactional
     public void handleOrderCreatedConfirmation(SagaEvent sagaEvent) {
         // Заказ создан успешно, подтверждаем резервацию (делаем списание)
