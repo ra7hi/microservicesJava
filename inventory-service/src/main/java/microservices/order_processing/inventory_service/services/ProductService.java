@@ -5,10 +5,10 @@ import microservices.order_processing.inventory_service.enums.UnavalibleProductR
 import microservices.order_processing.inventory_service.dto.ProductDto;
 import microservices.order_processing.inventory_service.entities.ProductEntity;
 import microservices.order_processing.inventory_service.exceptions.ProductNotFoundException;
+import microservices.order_processing.inventory_service.repositories.ProductRepository;
 import microservices.order_processing.inventory_service.grpc.AvailableProducts;
 import microservices.order_processing.inventory_service.grpc.Product;
 import microservices.order_processing.inventory_service.grpc.UnavailableProducts;
-import microservices.order_processing.inventory_service.repositories.ProductRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -75,7 +75,7 @@ public class ProductService {
      * @param productList список продуктов для проверки
      * @return список доступных продуктов с деталями {@link AvailableProducts}
      */
-    public List<AvailableProducts> getAvailabilityProducts(List<Product> productList) {
+    public List<microservices.order_processing.inventory_service.grpc.AvailableProducts> getAvailabilityProducts(List<Product> productList) {
         List<AvailableProducts> availabilities = new ArrayList<>();
 
         for (Product product : productList) {

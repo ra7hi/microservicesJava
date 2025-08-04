@@ -55,6 +55,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     @NonNull FilterChain filterChain)
                                         throws ServletException, IOException {
 
+        String path = request.getRequestURI();
+        if (path.startsWith("/swagger-ui")
+                || path.startsWith("/v3")
+                || path.startsWith("/swagger-resources")
+                || path.startsWith("/webjars")
+                || path.equals("/swagger-ui.html")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         Optional<String> jwt = getJwtFromRequest(request);
         if (jwt.isPresent()) {
             String token = jwt.get();

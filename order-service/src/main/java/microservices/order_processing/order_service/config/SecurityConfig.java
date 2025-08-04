@@ -26,6 +26,7 @@ public class SecurityConfig {
 
     private final CustomUserDetailsServiceImp customUserDetailsServiceImp;
     private final JwtAuthenticationEntryPoint unauthorizedHandler;
+    private final OpenApiConfig openApiConfig;
 
     /**
      * Шифратор паролей, использующий BCrypt.
@@ -86,8 +87,15 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests((authorizeRequest) ->
-                        authorizeRequest.requestMatchers("/api/auth/**").permitAll()
-                                .requestMatchers("/api/auth/hello").authenticated()
+                        authorizeRequest
+                                .requestMatchers("/api/auth/**").permitAll()
+                                .requestMatchers(
+                                        "/swagger-ui/**",
+                                        "/v3/**",
+                                        "/swagger-resources/**",
+                                        "/swagger-ui.html",
+                                        "/webjars/**"
+                                ).permitAll()
                                 .requestMatchers("/api/order/**").hasAnyRole("USER", "ADMIN")
                                 .requestMatchers("/api/users/**").hasRole("ADMIN")
                                 .anyRequest().authenticated()

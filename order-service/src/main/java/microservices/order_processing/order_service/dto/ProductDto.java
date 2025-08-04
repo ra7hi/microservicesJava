@@ -1,7 +1,9 @@
 package microservices.order_processing.order_service.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 /**
  * DTO-класс, описывающий продукт заказа.
@@ -9,6 +11,8 @@ import lombok.Builder;
  */
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ProductDto {
     private Long productId;
     private String name;

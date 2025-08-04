@@ -1,7 +1,9 @@
 package microservices.order_processing.order_service.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import microservices.order_processing.order_service.controllers.responses.OrderResponse;
 
 /**
@@ -11,6 +13,8 @@ import microservices.order_processing.order_service.controllers.responses.OrderR
  */
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class UnavailableProductDto {
     private long productId;
     private String reason;

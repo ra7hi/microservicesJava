@@ -16,7 +16,7 @@ import java.util.Set;
 public interface UserService {
     void registerUser(RegisterRequest registerRequest, Set<Role> roles);
     void createUser(UserDto userDto);
-    void updateUser(String username, UserDto userDto);
+    Users updateUser(String username, UserDto userDto);
     void deleteUser(String username);
     Optional<Users> findUserByUsername(String username);
     Optional<Users> findUserByEmail(String email);

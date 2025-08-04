@@ -1,6 +1,8 @@
 package microservices.order_processing.order_service.controllers.requests;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
@@ -12,6 +14,8 @@ import java.util.List;
  */
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class OrderRequest {
     /**
      * Список продуктов, включённых в заказ.

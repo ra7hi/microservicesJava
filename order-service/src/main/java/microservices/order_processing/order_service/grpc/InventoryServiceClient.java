@@ -5,6 +5,9 @@ import lombok.RequiredArgsConstructor;
 import microservices.order_processing.order_service.controllers.requests.OrderRequest;
 import microservices.order_processing.order_service.controllers.responses.OrderResponse;
 import microservices.order_processing.order_service.grpc.components.InventoryMapper;
+import microservices.order_processing.order_service.grpc.ProductsRequest;
+import microservices.order_processing.order_service.grpc.Product;
+import microservices.order_processing.order_service.grpc.OrderServiceGrpc.OrderServiceBlockingStub;
 import org.springframework.stereotype.Service;
 import microservices.order_processing.order_service.controllers.requests.ProductOrderRequest;
 
@@ -19,7 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class InventoryServiceClient {
 
-    private final OrderServiceGrpc.OrderServiceBlockingStub inventoryServiceStub;
+    private final OrderServiceBlockingStub inventoryServiceStub;
     private final InventoryMapper inventoryMapper;
 
     /**
@@ -41,7 +44,7 @@ public class InventoryServiceClient {
                     .addAllProducts(productList)
                     .build();
 
-            ProductsAvailabilityResponse response = inventoryServiceStub.checkProductAvailability(request);
+            microservices.order_processing.order_service.grpc.ProductsAvailabilityResponse response = inventoryServiceStub.checkProductAvailability(request);
             return inventoryMapper.buildFinalOrder(response);
 
         } catch (StatusRuntimeException e) {

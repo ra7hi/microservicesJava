@@ -5,6 +5,7 @@ import io.grpc.ManagedChannelBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import microservices.order_processing.order_service.grpc.OrderServiceGrpc;
 
 /**
  * Конфигурация для настройки gRPC-соединения с сервисом управления запасами (Inventory Service).

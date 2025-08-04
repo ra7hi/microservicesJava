@@ -89,24 +89,27 @@ public class UsersServiceImp implements UserService {
      * @throws RegistrationException если новое имя пользователя или email уже заняты другими пользователями
      */
     @Override
-    public void updateUser(String username, UserDto userDto) {
-        Optional<Users> user = usersRepository.findByUsername(username);
-        if(user.isPresent()) {
-            if (usersRepository.findByUsername(userDto.getUsername()).isPresent() &&
-                    !user.get().getUsername().equals(userDto.getUsername())) {
-                throw new RegistrationException("Username is already taken!");
-            }
-            if(usersRepository.findByEmail(userDto.getEmail()).isPresent() &&
-                    !user.get().getEmail().equals(userDto.getEmail())) {
-                throw new RegistrationException("Email is already in use!");
-            }
+    public Users updateUser(String username, UserDto userDto) {
+        Users existingUser = usersRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found!"));
+
+        if (userDto.getUsername() != null &&
+                usersRepository.findByUsername(userDto.getUsername()).isPresent() &&
+                !existingUser.getUsername().equals(userDto.getUsername())) {
+            throw new RegistrationException("Username is already taken!");
         }
-        else{
-            throw new UserNotFoundException("User not found!");
+
+        if (userDto.getEmail() != null &&
+                usersRepository.findByEmail(userDto.getEmail()).isPresent() &&
+                !existingUser.getEmail().equals(userDto.getEmail())) {
+            throw new RegistrationException("Email is already in use!");
         }
-        BeanUtils.copyProperties(userDto,user,
+
+        // Вот тут было user — стало existingUser
+        BeanUtils.copyProperties(userDto, existingUser,
                 NullPropertyNames.getNullPropertyNames(userDto));
-        usersRepository.save(user.get());
+
+        return usersRepository.save(existingUser);
     }
 
     /**
