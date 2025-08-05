@@ -51,7 +51,7 @@ class KafkaProducerServiceTest {
     }
 
     @Test
-    void sendSagaEvent_shouldSendEventSuccessfully() {
+    void sendSagaEventShouldSendEventSuccessfully() {
         SagaEvent sagaEvent = new SagaEvent();
         sagaEvent.setSagaId("inventory-saga-1");
 
@@ -68,7 +68,7 @@ class KafkaProducerServiceTest {
     }
 
     @Test
-    void sendSagaEvent_shouldHandleFailure() {
+    void sendSagaEventShouldHandleFailure() {
         SagaEvent sagaEvent = new SagaEvent();
         sagaEvent.setSagaId("inventory-saga-2");
 

@@ -76,7 +76,7 @@ class InventoryGrpcServiceTest {
     }
 
     @Test
-    void testCheckProductAvailability_UnavailableProduct() {
+    void testCheckProductAvailabilityUnavailableProduct() {
         Product product = Product.newBuilder()
                 .setProductId(2L)
                 .setQuantity(10L)

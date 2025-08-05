@@ -35,7 +35,7 @@ class KafkaProducerServiceTest {
     }
 
     @Test
-    void sendSagaEvent_shouldSendSuccessfully() {
+    void sendSagaEventShouldSendSuccessfully() {
         SagaEvent sagaEvent = new SagaEvent("saga-123", "order.created", null, null, null);
         SendResult<String, Object> sendResult = new SendResult<>(null, new RecordMetadata(null, 0, 0, 0L, 0L, 0, 0));
         CompletableFuture<SendResult<String, Object>> future = CompletableFuture.completedFuture(sendResult);
@@ -48,7 +48,7 @@ class KafkaProducerServiceTest {
     }
 
     @Test
-    void sendSagaEvent_shouldHandleSendFailure() {
+    void sendSagaEventShouldHandleSendFailure() {
         SagaEvent sagaEvent = new SagaEvent("saga-456", "order.created", null, null, null);
         CompletableFuture<SendResult<String, Object>> future = new CompletableFuture<>();
         future.completeExceptionally(new RuntimeException("Kafka send failure"));

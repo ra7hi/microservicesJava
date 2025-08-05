@@ -40,7 +40,7 @@ class OrderServiceTest {
     }
 
     @Test
-    void saveOrder_shouldMapAndSaveOrder() {
+    void saveOrderShouldMapAndSaveOrder() {
         OrderDto orderDto = OrderDto.builder()
                 .orderId("order123")
                 .userId(42L)
@@ -76,7 +76,7 @@ class OrderServiceTest {
     }
 
     @Test
-    void getAllOrders_shouldReturnAllOrdersFromRepository() {
+    void getAllOrdersShouldReturnAllOrdersFromRepository() {
         List<Order> orders = List.of(Order.builder().id("1").build(), Order.builder().id("2").build());
         when(orderRepository.findAll()).thenReturn(orders);
 
@@ -87,7 +87,7 @@ class OrderServiceTest {
     }
 
     @Test
-    void getOrderByOrderId_shouldReturnOrderIfExists() {
+    void getOrderByOrderIdShouldReturnOrderIfExists() {
         String orderId = "order-xyz";
         Order order = Order.builder().id(orderId).build();
         when(orderRepository.findOrderById(orderId)).thenReturn(Optional.of(order));
@@ -100,7 +100,7 @@ class OrderServiceTest {
     }
 
     @Test
-    void getOrderByOrderId_shouldReturnEmptyIfNotFound() {
+    void getOrderByOrderIdShouldReturnEmptyIfNotFound() {
         String orderId = "non-existing";
         when(orderRepository.findOrderById(orderId)).thenReturn(Optional.empty());
 
@@ -111,7 +111,7 @@ class OrderServiceTest {
     }
 
     @Test
-    void getAllOrdersByUserId_shouldReturnOrdersForUser() {
+    void getAllOrdersByUserIdShouldReturnOrdersForUser() {
         Long userId = 10L;
         List<Order> orders = List.of(Order.builder().userId(userId).build());
         when(orderRepository.findOrdersByUserId(userId)).thenReturn(orders);

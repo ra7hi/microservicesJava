@@ -1,8 +1,7 @@
-package microservices.order_processing.order_service;
+package microservices.order_processing.order_service.utils;
 
 import lombok.Getter;
 import lombok.Setter;
-import microservices.order_processing.order_service.utils.NullPropertyNames;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -27,7 +26,7 @@ class NullPropertyNamesTest {
     }
 
     @Test
-    void testGetNullPropertyNames_returnsCorrectNullProperties() {
+    void testGetNullPropertyNamesReturnsCorrectNullProperties() {
         TestObject obj = new TestObject();
 
         String[] nullProperties = NullPropertyNames.getNullPropertyNames(obj);
@@ -40,7 +39,7 @@ class NullPropertyNamesTest {
     }
 
     @Test
-    void testGetNullPropertyNames_withAllNonNullFields_returnsEmptyArray() {
+    void testGetNullPropertyNamesWithAllNonNullFieldsReturnsEmptyArray() {
         TestObject obj = new TestObject();
         obj.setNullField("not null");
         obj.setAnotherNullField(100);
@@ -51,7 +50,7 @@ class NullPropertyNamesTest {
     }
 
     @Test
-    void testGetNullPropertyNames_withAllFieldsNull_returnsAllFieldNames() {
+    void testGetNullPropertyNamesWithAllFieldsNullReturnsAllFieldNames() {
         TestObject obj = new TestObject();
         obj.setNonNullField(null);
         obj.setNonNullInteger(null);

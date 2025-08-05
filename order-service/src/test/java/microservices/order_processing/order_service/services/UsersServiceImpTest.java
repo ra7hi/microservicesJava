@@ -1,4 +1,4 @@
-package microservices.order_processing.order_service;
+package microservices.order_processing.order_service.services;
 
 
 import microservices.order_processing.order_service.controllers.requests.RegisterRequest;
@@ -8,7 +8,6 @@ import microservices.order_processing.order_service.enums.Role;
 import microservices.order_processing.order_service.exception.RegistrationException;
 import microservices.order_processing.order_service.exception.UserNotFoundException;
 import microservices.order_processing.order_service.repository.UsersRepository;
-import microservices.order_processing.order_service.services.UsersServiceImp;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -40,7 +39,7 @@ public class UsersServiceImpTest {
     private UsersServiceImp usersService;
 
     @Test
-    public void registerUser_Success() throws GeneralSecurityException {
+    public void registerUserSuccess() throws GeneralSecurityException {
         RegisterRequest request = new RegisterRequest("user", "email@test.com", "password");
         Set<Role> roles = Set.of(Role.USER);
 
@@ -62,7 +61,7 @@ public class UsersServiceImpTest {
     }
 
     @Test
-    public void registerUser_UsernameTaken_ThrowsException() {
+    public void registerUserUsernameTakenThrowsException() {
         RegisterRequest request = new RegisterRequest("taken", "email@test.com", "pass");
         when(usersRepository.findByUsername("taken"))
                 .thenReturn(Optional.of(new Users()));
@@ -73,7 +72,7 @@ public class UsersServiceImpTest {
     }
 
     @Test
-    public void registerUser_EmailTaken_ThrowsException() {
+    public void registerUserEmailTakenThrowsException() {
         RegisterRequest request = new RegisterRequest("user", "taken@test.com", "pass");
         when(usersRepository.findByUsername("user")).thenReturn(Optional.empty());
         when(usersRepository.findByEmail("taken@test.com")).thenReturn(Optional.of(new Users()));
@@ -84,7 +83,7 @@ public class UsersServiceImpTest {
     }
 
     @Test
-    public void createUser_Success() throws GeneralSecurityException {
+    public void createUserSuccess() throws GeneralSecurityException {
         UserDto userDto = new UserDto("newUser", "new@email.com", "password", Set.of(Role.ADMIN));
 
         when(usersRepository.findByUsername("newUser"))
@@ -105,7 +104,7 @@ public class UsersServiceImpTest {
     }
 
     @Test
-    public void createUser_DuplicateEmail_ThrowsException() {
+    public void createUserDuplicateEmailThrowsException() {
         UserDto userDto = new UserDto("user", "taken@email.com", "pass", Set.of(Role.USER));
         when(usersRepository.findByUsername("user")).thenReturn(Optional.empty());
         when(usersRepository.findByEmail("taken@email.com")).thenReturn(Optional.of(new Users()));
@@ -116,7 +115,7 @@ public class UsersServiceImpTest {
     }
 
     @Test
-    public void updateUser_Success() {
+    public void updateUserSuccess() {
         Users existingUser = new Users();
         existingUser.setUsername("oldUser");
         existingUser.setEmail("old@email.com");
@@ -139,7 +138,7 @@ public class UsersServiceImpTest {
     }
 
     @Test
-    public void updateUser_PartialUpdate_Success() {
+    public void updateUserPartialUpdateSuccess() {
         Users existingUser = new Users();
         existingUser.setUsername("oldUser");
         existingUser.setEmail("old@email.com");
@@ -164,7 +163,7 @@ public class UsersServiceImpTest {
 
 
     @Test
-    public void updateUser_UserNotFound_ThrowsException() {
+    public void updateUserUserNotFoundThrowsException() {
         UserDto updateDto = new UserDto();
         when(usersRepository.findByUsername("unknown"))
                 .thenReturn(Optional.empty());
@@ -175,7 +174,7 @@ public class UsersServiceImpTest {
     }
 
     @Test
-    public void updateUser_DuplicateUsername_ThrowsException() {
+    public void updateUserDuplicateUsernameThrowsException() {
         Users existingUser = new Users();
         existingUser.setUsername("user1");
         existingUser.setEmail("user1@test.com");
@@ -196,7 +195,7 @@ public class UsersServiceImpTest {
     }
 
     @Test
-    public void deleteUser_Success() {
+    public void deleteUserSuccess() {
         Users user = new Users();
         when(usersRepository.findByUsername("user"))
                 .thenReturn(Optional.of(user));
@@ -207,7 +206,7 @@ public class UsersServiceImpTest {
     }
 
     @Test
-    public void deleteUser_UserNotFound_ThrowsException() {
+    public void deleteUserUserNotFoundThrowsException() {
         when(usersRepository.findByUsername("unknown"))
                 .thenReturn(Optional.empty());
 

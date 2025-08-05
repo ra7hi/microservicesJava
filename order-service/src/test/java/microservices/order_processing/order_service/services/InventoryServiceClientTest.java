@@ -1,4 +1,4 @@
-package microservices.order_processing.order_service;
+package microservices.order_processing.order_service.services;
 
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
@@ -47,7 +47,7 @@ class InventoryServiceClientTest {
     }
 
     @Test
-    void checkProductsAvailability_success() {
+    void checkProductsAvailabilitySuccess() {
         ProductOrderRequest productRequest1 = new ProductOrderRequest(1L, 2L);
         ProductOrderRequest productRequest2 = new ProductOrderRequest(2L, 3L);
         List<ProductOrderRequest> productRequests = Arrays.asList(productRequest1, productRequest2);
@@ -85,7 +85,7 @@ class InventoryServiceClientTest {
     }
 
     @Test
-    void checkProductsAvailability_grpcError() {
+    void checkProductsAvailabilityGrpcError() {
         ProductOrderRequest productRequest = new ProductOrderRequest(1L, 2L);
         OrderRequest orderRequest = new OrderRequest(List.of(productRequest), "order123");
 

@@ -1,9 +1,9 @@
-package microservices.order_processing.order_service;
+package microservices.order_processing.order_service.services;
 
 
 import microservices.order_processing.order_service.kafka.KafkaProducerService;
 import microservices.order_processing.order_service.saga.SagaEvent;
-import microservices.order_processing.order_service.utils.TestUtils;
+import microservices.order_processing.order_service.TestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -50,7 +50,7 @@ class KafkaProducerServiceTest {
     }
 
     @Test
-    void sendSagaEvent_shouldSendEventSuccessfully() {
+    void sendSagaEventShouldSendEventSuccessfully() {
         SagaEvent sagaEvent = new SagaEvent();
         sagaEvent.setSagaId("saga-123");
 
@@ -72,7 +72,7 @@ class KafkaProducerServiceTest {
     }
 
     @Test
-    void sendSagaEvent_shouldLogErrorOnFailure() {
+    void sendSagaEventShouldLogErrorOnFailure() {
         SagaEvent sagaEvent = new SagaEvent();
         sagaEvent.setSagaId("saga-456");
 

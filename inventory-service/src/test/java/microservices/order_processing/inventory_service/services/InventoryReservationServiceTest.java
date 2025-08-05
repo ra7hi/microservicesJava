@@ -40,7 +40,7 @@ class InventoryReservationServiceTest {
     private InventoryReservationService inventoryReservationService;
 
     @Test
-    void testHandleInventoryReservation_success() {
+    void testHandleInventoryReservationSuccess() {
         String sagaId = "saga-123";
         long productId = 1L;
         long quantity = 5L;
@@ -72,7 +72,7 @@ class InventoryReservationServiceTest {
     }
 
     @Test
-    void testHandleInventoryReservation_insufficientInventory() {
+    void testHandleInventoryReservationInsufficientInventory() {
         String sagaId = "saga-456";
         long productId = 2L;
         long quantity = 10L;
@@ -98,7 +98,7 @@ class InventoryReservationServiceTest {
     }
 
     @Test
-    void testHandleInventoryRelease_success() {
+    void testHandleInventoryReleaseSuccess() {
         String sagaId = "saga-789";
         SagaEvent sagaEvent = new SagaEvent(sagaId, "inventory.release", null, null, null);
 
@@ -121,7 +121,7 @@ class InventoryReservationServiceTest {
     }
 
     @Test
-    void testHandleOrderCreatedConfirmation_success() {
+    void testHandleOrderCreatedConfirmationSuccess() {
         String sagaId = "saga-999";
         SagaEvent sagaEvent = new SagaEvent(sagaId, "order.created", null, null, null);
 

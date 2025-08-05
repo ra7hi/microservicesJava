@@ -41,7 +41,7 @@ class ProductServiceTest {
     }
 
     @Test
-    void testFindProductById_success() {
+    void testFindProductByIdSuccess() {
         ProductEntity entity = createProductEntity(1L);
         when(productRepository.findById(1L)).thenReturn(Optional.of(entity));
 
@@ -54,7 +54,7 @@ class ProductServiceTest {
     }
 
     @Test
-    void testFindProductById_notFound() {
+    void testFindProductByIdNotFound() {
         when(productRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThrows(ProductNotFoundException.class, () -> productService.findProductById(1L));
@@ -84,7 +84,7 @@ class ProductServiceTest {
     }
 
     @Test
-    void testUpdateProduct_success() {
+    void testUpdateProductSuccess() {
         ProductDto dto = createProductDto();
         when(productRepository.findById(1L)).thenReturn(Optional.of(createProductEntity(1L)));
 
@@ -94,7 +94,7 @@ class ProductServiceTest {
     }
 
     @Test
-    void testUpdateProduct_notFound() {
+    void testUpdateProductNotFound() {
         ProductDto dto = createProductDto();
         when(productRepository.findById(1L)).thenReturn(Optional.empty());
 
@@ -102,7 +102,7 @@ class ProductServiceTest {
     }
 
     @Test
-    void testDeleteProduct_success() {
+    void testDeleteProductSuccess() {
         when(productRepository.existsById(1L)).thenReturn(true);
 
         productService.deleteProduct(1L);
@@ -111,7 +111,7 @@ class ProductServiceTest {
     }
 
     @Test
-    void testDeleteProduct_notFound() {
+    void testDeleteProductNotFound() {
         when(productRepository.existsById(1L)).thenReturn(false);
 
         assertThrows(ProductNotFoundException.class, () -> productService.deleteProduct(1L));
@@ -134,7 +134,7 @@ class ProductServiceTest {
     }
 
     @Test
-    void testGetUnavalabilityProducts_notFound() {
+    void testGetUnavalabilityProductsNotFound() {
         when(productRepository.findProductById(1L)).thenReturn(Optional.empty());
 
         Product grpcProduct = Product.newBuilder()
@@ -149,7 +149,7 @@ class ProductServiceTest {
     }
 
     @Test
-    void testGetUnavalabilityProducts_insufficientQuantity() {
+    void testGetUnavalabilityProductsInsufficientQuantity() {
         ProductEntity entity = createProductEntity(1L);
         entity.setAvailableQuantity(2L);
         when(productRepository.findProductById(1L)).thenReturn(Optional.of(entity));

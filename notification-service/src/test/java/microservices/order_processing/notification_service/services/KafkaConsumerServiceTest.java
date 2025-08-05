@@ -35,7 +35,7 @@ class KafkaConsumerServiceTest {
     }
 
     @Test
-    void handleSagaEvents_shouldProcessOrderCreateEventSuccessfully() {
+    void handleSagaEventsShouldProcessOrderCreateEventSuccessfully() {
         OrderDto orderDto = OrderDto.builder()
                 .orderId("order-123")
                 .userId(1L)
@@ -67,7 +67,7 @@ class KafkaConsumerServiceTest {
     }
 
     @Test
-    void handleSagaEvents_shouldHandleOrderCreateFailure() {
+    void handleSagaEventsShouldHandleOrderCreateFailure() {
         OrderDto orderDto = OrderDto.builder()
                 .orderId("order-124")
                 .userId(2L)
@@ -95,7 +95,7 @@ class KafkaConsumerServiceTest {
     }
 
     @Test
-    void handleSagaEvents_shouldIgnoreUnknownEventType() {
+    void handleSagaEventsShouldIgnoreUnknownEventType() {
         SagaEvent unknownEvent = new SagaEvent(
                 "saga-3", "unknown.event", null, null, null);
 

@@ -116,7 +116,7 @@ public class OrderServiceImp implements OrderService {
      * Обновляет состояние саги и инициирует создание заказа.
      * @param sagaEvent событие "inventory.reserved"
      */
-    private void handleInventoryReserved(SagaEvent sagaEvent) {
+    public void handleInventoryReserved(SagaEvent sagaEvent) {
         SagaState sagaState = sagaStateRepository.findBySagaId(sagaEvent.getSagaId());
         sagaState.setStatus(SagaStatus.INVENTORY_RESERVED);
         sagaStateRepository.save(sagaState);
@@ -126,6 +126,10 @@ public class OrderServiceImp implements OrderService {
                 (List<ProductDto>) sagaEvent.getPayload(),
                 sagaState.getOrderId()
         );
+
+        if (order == null) {
+            throw new IllegalStateException("Failed to build order");
+        }
 
         SagaEvent createOrderEvent = new SagaEvent(
                 sagaEvent.getSagaId(), "order.create", SagaStatus.INVENTORY_RESERVED, order, null);
@@ -153,17 +157,23 @@ public class OrderServiceImp implements OrderService {
      *
      * @param sagaEvent событие ошибки саги ("inventory.reservation.failed" или "order.creation.failed")
      */
-    private void handleSagaFailure(SagaEvent sagaEvent) {
-        // Начинаем компенсацию
+    public void handleSagaFailure(SagaEvent sagaEvent) {
         SagaState sagaState = sagaStateRepository.findBySagaId(sagaEvent.getSagaId());
+
+        // Сохраняем предыдущий статус перед изменением
+        SagaStatus previousStatus = sagaState.getStatus();
+
         sagaState.setStatus(SagaStatus.COMPENSATING);
         sagaStateRepository.save(sagaState);
 
-        if (sagaState.getStatus() == SagaStatus.INVENTORY_RESERVED) {
-            // Если товары были зарезервированы, освобождаем их
+        if (previousStatus == SagaStatus.INVENTORY_RESERVED) {  // Проверяем предыдущий статус
             SagaEvent compensateEvent = new SagaEvent(
-                    sagaEvent.getSagaId(), "inventory.release", SagaStatus.COMPENSATING,
-                    sagaState.getOrderId(), sagaEvent.getErrorMessage());
+                    sagaEvent.getSagaId(),
+                    "inventory.release",
+                    SagaStatus.COMPENSATING,
+                    sagaState.getOrderId(),
+                    sagaEvent.getErrorMessage()
+            );
             kafkaProducerService.sendSagaEvent(compensateEvent);
         }
     }
